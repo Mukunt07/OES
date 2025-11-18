@@ -3,7 +3,7 @@ import { useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 
-export default function Navbar({ theme, toggleTheme }) {
+export default function Navbar() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -24,11 +24,9 @@ export default function Navbar({ theme, toggleTheme }) {
               to="/dashboard"
               className="flex items-center space-x-2 hover:scale-105 transition-transform duration-300"
             >
-              <img
-                src="/src/assets/logo.png"
-                alt="OES Logo"
-                className="h-10 lg:h-12 w-auto object-contain logo-image"
-              />
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <span className="text-lg font-bold text-white">OES</span>
+              </div>
               <span className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
                 OES
               </span>
@@ -66,25 +64,6 @@ export default function Navbar({ theme, toggleTheme }) {
               <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-blue-500 group-hover:w-3/4 transition-all duration-200"></span>
             </Link>
 
-            {/* Dark Mode Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2.5 rounded-xl bg-gray-800/80 text-gray-300 hover:bg-gray-700/90 transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md backdrop-blur-sm ml-2"
-              aria-label="Toggle theme"
-            >
-              <div className={`transform transition-transform duration-500 ${theme === 'light' ? 'rotate-0' : 'rotate-180'}`}>
-                {theme === 'light' ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                )}
-              </div>
-            </button>
-
             <button
               onClick={handleLogout}
               className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 lg:px-6 py-2.5 rounded-xl hover:from-red-600 hover:to-red-700 transform hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg hover:shadow-xl text-sm lg:text-base font-medium ml-2"
@@ -95,24 +74,6 @@ export default function Navbar({ theme, toggleTheme }) {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-2">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg bg-gray-800/80 text-gray-300 hover:bg-gray-700/90 transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md backdrop-blur-sm"
-              aria-label="Toggle theme"
-            >
-              <div className={`transform transition-transform duration-500 ${theme === 'light' ? 'rotate-0' : 'rotate-180'}`}>
-                {theme === 'light' ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                  </svg>
-                ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                )}
-              </div>
-            </button>
-
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-lg bg-gray-800/80 text-gray-300 hover:bg-gray-700/90 transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md backdrop-blur-sm"
