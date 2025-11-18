@@ -79,6 +79,15 @@
   @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900;
 }
 
+/* Logo styles */
+.logo-image {
+  filter: brightness(1);
+}
+
+.dark .logo-image {
+  filter: brightness(1.2);
+}
+
 /* Dark mode styles */
 @media (prefers-color-scheme: dark) {
   :root {

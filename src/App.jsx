@@ -98,6 +98,9 @@ export default function App() {
             }
           />
         </Routes>
+        <footer className="text-center text-gray-500 dark:text-gray-400 text-xs py-6">
+          © {new Date().getFullYear()} OES • Powered by Online Exam System
+        </footer>
       </div>
     </BrowserRouter>
   );

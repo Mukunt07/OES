@@ -121,7 +121,12 @@ export default function Dashboard() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05),transparent_70%)]"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-          <div className="text-center">
+        <div className="text-center">
+            <img
+              src="/src/assets/logo.png"
+              alt="OES Logo"
+              className="w-20 sm:w-24 mx-auto mb-4 logo-image"
+            />
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-thin tracking-tight mb-6">
               Choose Your
               <span className="block font-light bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">

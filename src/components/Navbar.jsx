@@ -22,9 +22,16 @@ export default function Navbar({ theme, toggleTheme }) {
           <div className="flex items-center">
             <Link
               to="/dashboard"
-              className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent hover:from-purple-400 hover:to-blue-400 transition-all duration-300 tracking-tight animate-pulse"
+              className="flex items-center space-x-2 hover:scale-105 transition-transform duration-300"
             >
-              OES
+              <img
+                src="/src/assets/logo.png"
+                alt="OES Logo"
+                className="h-10 lg:h-12 w-auto object-contain logo-image"
+              />
+              <span className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                OES
+              </span>
             </Link>
           </div>
 
