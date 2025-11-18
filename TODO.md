@@ -1,34 +1,32 @@
-# UI/UX Upgrade Plan for OES Project
+# Gamification System Integration TODO
 
-## Completed Tasks
-- [x] Create TODO.md file
-- [x] Navbar.jsx - Reduce height, add smooth toggle animation with rotation, enhance shadow, improve dark mode styling, better mobile layout
+## 1. Update ResultPage.jsx
+- [x] Add points calculation: +10 per correct, +2 completion, +5 speed (<2min)
+- [x] Add XP calculation: XP = score * 5
+- [x] Update Firestore user stats: totalPoints, xp, level, totalQuizzes, averageScore, maxScore
+- [x] Implement badge logic: Beginner, Sharp Mind, Speedster, Streak Master, Quiz King/Queen, Category Pro
+- [x] Add level up popup if user leveled up
+- [x] Add badge earned animation
 
-## Completed Tasks
-- [x] Create TODO.md file
-- [x] Navbar.jsx - Reduce height, add smooth toggle animation with rotation, enhance shadow, improve dark mode styling, better mobile layout
-- [x] Dashboard.jsx - Make topic cards more compact with better icons, add hover-scale animations, fix grid layout for mobile (2 columns on small screens), improve spacing and card shadows
+## 2. Update ProfilePage.jsx
+- [ ] Load user stats from Firestore (totalPoints, xp, level, etc.)
+- [ ] Load user badges
+- [ ] Add new UI sections: Total Points, Level + XP Progress Bar, Total Quizzes, Average Score, Earned Badges Grid, Last 5 Quiz Results
+- [ ] Ensure mobile responsive
 
-## Completed Tasks
-- [x] Create TODO.md file
-- [x] Navbar.jsx - Reduce height, add smooth toggle animation with rotation, enhance shadow, improve dark mode styling, better mobile layout
-- [x] Dashboard.jsx - Make topic cards more compact with better icons, add hover-scale animations, fix grid layout for mobile (2 columns on small screens), improve spacing and card shadows
-- [x] QuizPage.jsx - Enhance option buttons with better styling and hover effects, improve "show correct answer" UI with color coding, lock answers after reveal, create cleaner timer UI with progress ring, fix mobile layout for options
-- [x] ResultPage.jsx - Make grade badge smaller and more centered, improve stats cards layout, make question review list more compact and scrollable
+## 3. Update Leaderboard.jsx
+- [ ] Change query to collection("users") orderBy("stats.totalPoints", "desc") limit(20)
+- [ ] Display: Rank, Name, Level, Points, Highest Score Badge
+- [ ] Handle real-time updates
 
-## Completed Tasks
-- [x] Create TODO.md file
-- [x] Navbar.jsx - Reduce height, add smooth toggle animation with rotation, enhance shadow, improve dark mode styling, better mobile layout
-- [x] Dashboard.jsx - Make topic cards more compact with better icons, add hover-scale animations, fix grid layout for mobile (2 columns on small screens), improve spacing and card shadows
-- [x] QuizPage.jsx - Enhance option buttons with better styling and hover effects, improve "show correct answer" UI with color coding, lock answers after reveal, create cleaner timer UI with progress ring, fix mobile layout for options
-- [x] ResultPage.jsx - Make grade badge smaller and more centered, improve stats cards layout, make question review list more compact and scrollable
-- [x] ProfilePage.jsx - Add icons to stats cards, improve user info card layout, better spacing between sections, fix mobile responsiveness
-- [x] LoginPage.jsx & SignupPage.jsx - Make forms more compact on mobile, improve button animations, better alignment and spacing, enhance loading states
-- [x] Leaderboard.jsx - Improve table responsiveness with better mobile view, enhance header styling, add better loading skeletons
-- [x] App.jsx - Ensure loading screen is fully responsive and matches theme
+## 4. Update Dashboard.jsx
+- [ ] Add XP/points preview section
+- [ ] Load and display user's current XP and points
 
-## Followup Steps
-- [ ] Test full responsiveness on mobile/tablet/desktop
-- [ ] Verify dark/light theme switching works across all components
-- [ ] Ensure no functional code is broken
-- [ ] Check animations and hover effects work smoothly
+## 5. Testing and Final Checks
+- [ ] Test points/XP calculation
+- [ ] Test badge awarding
+- [ ] Test level up
+- [ ] Test leaderboard display
+- [ ] Ensure no breaking changes to existing functionality
+- [ ] Mobile responsiveness check
