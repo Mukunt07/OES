@@ -1,16 +1,25 @@
-import { useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useLocation, Link, Navigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function ResultPage() {
   const location = useLocation();
-  const { topic, answers, questions, timeSpent } = location.state || {};
+  // Use a ref to prevent double-saving in React Strict Mode
+  const hasSaved = useRef(false);
+
+  // 1. SAFETY CHECK: If no state exists (user refreshed page), redirect to home
+  if (!location.state || !location.state.questions) {
+    return <Navigate to="/" replace />;
+  }
+
+  const { topic, answers, questions, timeSpent } = location.state;
 
   // Calculate score
   const calculateScore = () => {
     let correct = 0;
     Object.keys(answers).forEach((i) => {
+      // Ensure question exists before checking
       if (questions[i] && answers[i] === questions[i].correct) {
         correct++;
       }
@@ -37,11 +46,16 @@ export default function ResultPage() {
 
   // 🔥 Save result to Firestore
   useEffect(() => {
+    // 2. PREVENT DUPLICATES: Check if we already saved
+    if (hasSaved.current) return;
+
     const saveToFirestore = async () => {
       const user = auth.currentUser;
       if (!user) return;
 
       try {
+        hasSaved.current = true; // Mark as saved immediately
+
         // Save to user's results
         await addDoc(collection(db, "users", user.uid, "results"), {
           topic,
@@ -66,86 +80,106 @@ export default function ResultPage() {
         console.log("🎉 Result saved to Firestore!");
       } catch (error) {
         console.error("❌ Error saving result:", error);
+        hasSaved.current = false; // Reset if error, so it tries again if needed
       }
     };
 
     saveToFirestore();
-  }, [topic, score, questions.length, percentage, timeSpent, answers]); // Runs only once
+    // Remove extensive dependencies to ensure this only attempts to run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-3 sm:p-4 lg:p-8 animate-fadeIn">
-      <div className="max-w-2xl w-full">
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Header */}
-        <div className="text-center mb-4 sm:mb-6 lg:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Quiz Results
+        <div className="text-center mb-12">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-thin tracking-tight mb-4">
+            Quiz Complete
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 capitalize">{topic} Quiz</p>
+          <p className="text-xl text-gray-400 capitalize">{topic} Quiz Results</p>
         </div>
 
         {/* Score Card */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl dark:shadow-gray-900/20 border border-gray-200/50 dark:border-gray-700/50 p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6 lg:mb-8 text-center">
-          <div className={`w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-gradient-to-r ${color} rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6`}>
-            <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">{grade}</span>
+        <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 mb-8 text-center">
+          <div className={`w-24 h-24 bg-gradient-to-br ${color} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-gray-900/50`}>
+            <span className="text-3xl font-bold text-white">{grade}</span>
           </div>
 
-          <div className="mb-4 sm:mb-6">
-            <div className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-gray-200 dark:to-gray-400 bg-clip-text text-transparent mb-2">
-              {score} / {questions.length}
+          <div className="mb-8">
+            <div className="text-6xl sm:text-7xl lg:text-8xl font-thin mb-4">
+              {score} <span className="text-gray-500">/</span> {questions.length}
             </div>
-            <div className="text-xl sm:text-2xl font-semibold text-gray-600 dark:text-gray-400">{percentage}%</div>
+            <div className="text-2xl text-gray-400 font-light">{percentage}% Score</div>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
+            <div className="text-3xl font-bold text-green-400 mb-2 flex items-center justify-center">
+              <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              {score}
+            </div>
+            <div className="text-sm text-gray-500 text-center">Correct</div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 sm:p-4">
-              <div className="text-xl sm:text-2xl font-bold text-green-600">{score}</div>
-              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Correct</div>
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
+            <div className="text-3xl font-bold text-red-400 mb-2 flex items-center justify-center">
+              <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+              {questions.length - score}
             </div>
+            <div className="text-sm text-gray-500 text-center">Incorrect</div>
+          </div>
 
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 sm:p-4">
-              <div className="text-xl sm:text-2xl font-bold text-red-600">{questions.length - score}</div>
-              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Incorrect</div>
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
+            <div className="text-3xl font-bold text-blue-400 mb-2 flex items-center justify-center">
+              <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12,6 12,12 16,14"></polyline>
+              </svg>
+              {timeFormatted}
             </div>
-
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 sm:p-4">
-              <div className="text-xl sm:text-2xl font-bold text-blue-600">{timeFormatted}</div>
-              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Time</div>
-            </div>
+            <div className="text-sm text-gray-500 text-center">Time</div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
           <Link
             to="/dashboard"
-            className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold hover:scale-105 transition-all duration-200 shadow-lg text-center"
+            className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-lg shadow-blue-500/25 text-center"
           >
             Take Another Quiz
           </Link>
 
           <Link
             to={`/quiz/${topic}`}
-            className="px-6 sm:px-8 py-3 sm:py-4 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 text-center"
+            className="px-8 py-4 bg-gray-800/50 border border-gray-700/50 text-gray-300 rounded-2xl font-medium hover:bg-gray-700/50 hover:border-gray-600 transition-all duration-300 text-center"
           >
             Retake This Quiz
           </Link>
         </div>
 
         {/* Detailed Review */}
-        <div className="mt-4 sm:mt-6 lg:mt-8 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Question Review</h3>
+        <div className="bg-gray-900/30 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8">
+          <h3 className="text-2xl font-light text-white mb-6">Question Review</h3>
 
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {questions.map((q, i) => {
               const correct = answers[i] === q.correct;
               return (
-                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Question {i + 1}</span>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    correct ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                <div key={i} className="flex items-center justify-between p-4 bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/30">
+                  <span className="text-lg font-medium text-gray-300">Question {i + 1}</span>
+                  <span className={`px-4 py-2 rounded-xl text-sm font-medium ${
+                    correct ? "bg-green-500/20 border border-green-500/50 text-green-400" : "bg-red-500/20 border border-red-500/50 text-red-400"
                   }`}>
-                    {correct ? "Correct" : "Incorrect"}
+                    {correct ? "✓ Correct" : "✗ Incorrect"}
                   </span>
                 </div>
               );

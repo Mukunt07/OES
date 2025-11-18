@@ -143,61 +143,85 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-3 sm:p-4 lg:p-8 animate-fadeIn">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Header */}
-        <div className="text-center mb-4 sm:mb-6 lg:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2 capitalize">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-thin tracking-tight mb-4 capitalize">
             {topic} Quiz
           </h1>
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6 text-gray-600 dark:text-gray-400">
-            <span className="text-sm sm:text-base">Question {current + 1} of {questions.length}</span>
-            <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-              timeLeft > 60 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-            }`}>
-              Time: {formatTime(timeLeft)}
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8 text-gray-400">
+            <span className="text-lg">Question {current + 1} of {questions.length}</span>
+            <div className="relative">
+              <svg className="w-20 h-20" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                  className="text-gray-700"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 45}`}
+                  strokeDashoffset={`${2 * Math.PI * 45 * (1 - timeLeft / 300)}`}
+                  className={`transition-all duration-1000 ease-linear ${timeLeft > 60 ? "text-blue-500" : "text-red-500"}`}
+                  strokeLinecap="round"
+                  transform="rotate(-90 50 50)"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-medium">{formatTime(timeLeft)}</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4 sm:mb-6 lg:mb-8">
+        <div className="w-full bg-gray-800 rounded-full h-1 mb-8">
           <div
-            className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 h-1 rounded-full transition-all duration-500"
             style={{ width: `${((current + 1) / questions.length) * 100}%` }}
           ></div>
         </div>
 
         {/* Question Card */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-2xl dark:shadow-gray-900/20 border border-gray-200/50 dark:border-gray-700/50 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-4 sm:mb-6 lg:mb-8 text-gray-800 dark:text-gray-200 leading-relaxed">
+        <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 mb-8">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-light mb-8 text-white leading-relaxed">
             {questions[current].question}
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {questions[current].options.map((option, index) => {
               const isSelected = selectedAnswers[current] === index;
               const isCorrect = index === questions[current].correct;
               const isRevealed = revealed[current];
               const isWrongSelected = isSelected && !isCorrect;
 
-              let buttonClass = "p-3 sm:p-4 rounded-xl text-left font-medium transition-all duration-200 transform hover:scale-[1.02] ";
+              let buttonClass = "group relative p-6 rounded-2xl text-left font-medium transition-all duration-300 border ";
 
               if (isRevealed) {
                 if (isCorrect) {
-                  buttonClass += "bg-green-500 text-white shadow-lg";
+                  buttonClass += "bg-green-500/20 border-green-500 text-green-400 shadow-lg shadow-green-500/20";
                 } else if (isWrongSelected) {
-                  buttonClass += "bg-red-500 text-white shadow-lg";
+                  buttonClass += "bg-red-500/20 border-red-500 text-red-400 shadow-lg shadow-red-500/20";
                 } else if (!isSelected && isCorrect) {
-                  buttonClass += "bg-green-200 text-gray-800 border-2 border-green-500 dark:bg-green-900 dark:text-gray-200";
+                  buttonClass += "bg-green-500/10 border-green-500/50 text-green-300";
                 } else {
-                  buttonClass += "bg-gray-50 text-gray-700 border border-gray-200 dark:bg-gray-700 dark:text-gray-300";
+                  buttonClass += "bg-gray-800/50 border-gray-700 text-gray-400";
                 }
               } else {
                 buttonClass += isSelected
-                  ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg"
-                  : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 dark:border-gray-600";
+                  ? "bg-blue-500/20 border-blue-500 text-blue-400 shadow-lg shadow-blue-500/20"
+                  : "bg-gray-800/30 border-gray-700/50 text-gray-300 hover:bg-gray-700/50 hover:border-gray-600 hover:text-white";
               }
 
               return (
@@ -207,10 +231,22 @@ export default function QuizPage() {
                   disabled={isRevealed}
                   className={buttonClass}
                 >
-                  <span className="inline-block w-6 h-6 rounded-full border-2 border-current mr-3 text-sm flex items-center justify-center">
-                    {String.fromCharCode(65 + index)}
-                  </span>
-                  {option}
+                  <div className="flex items-center space-x-4">
+                    <div className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                      isRevealed
+                        ? isCorrect
+                          ? "bg-green-500 text-white"
+                          : isWrongSelected
+                          ? "bg-red-500 text-white"
+                          : "bg-gray-600 text-gray-300"
+                        : isSelected
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-700 text-gray-400 group-hover:bg-gray-600 group-hover:text-white"
+                    }`}>
+                      {String.fromCharCode(65 + index)}
+                    </div>
+                    <span className="text-lg leading-relaxed">{option}</span>
+                  </div>
                 </button>
               );
             })}
@@ -218,46 +254,42 @@ export default function QuizPage() {
 
           {/* Show Correct Answer Button */}
           {selectedAnswers[current] !== undefined && (
-            <div className="mt-4 text-center">
+            <div className="mt-8 text-center">
               <button
                 onClick={() => setRevealed({ ...revealed, [current]: true })}
                 disabled={revealed[current]}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                   revealed[current]
-                    ? "bg-gray-400 text-gray-700 cursor-not-allowed dark:bg-gray-600 dark:text-gray-300"
-                    : "bg-blue-500 text-white hover:bg-blue-600"
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    : "bg-blue-500/20 border border-blue-500/50 text-blue-400 hover:bg-blue-500/30 hover:border-blue-400"
                 }`}
               >
-                {revealed[current] ? "Answer Shown" : "Show Correct Answer"}
+                {revealed[current] ? "Answer Revealed" : "Reveal Answer"}
               </button>
             </div>
           )}
         </div>
 
         {/* Navigation */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <button
             onClick={() => setCurrent(Math.max(0, current - 1))}
             disabled={current === 0}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="w-full sm:w-auto px-6 py-3 bg-gray-800/50 border border-gray-700/50 text-gray-300 rounded-xl font-medium hover:bg-gray-700/50 hover:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
           >
             Previous
           </button>
 
-          <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
+          <div className="text-gray-400 text-center">
             {Object.keys(selectedAnswers).length} of {questions.length} answered
           </div>
 
           <button
             onClick={handleNext}
             disabled={selectedAnswers[current] === undefined}
-            className="
-              w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium
-              hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed
-              transform hover:scale-105 transition-all duration-200 shadow-lg
-            "
+            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-blue-500/25"
           >
-            {current === questions.length - 1 ? "Finish Quiz" : "Next"}
+            {current === questions.length - 1 ? "Complete Quiz" : "Continue"}
           </button>
         </div>
       </div>
