@@ -73,77 +73,77 @@ export default function ResultPage() {
   }, [topic, score, questions.length, percentage, timeSpent, answers]); // Runs only once
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center p-4 animate-fadeIn">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-3 sm:p-4 lg:p-8 animate-fadeIn">
       <div className="max-w-2xl w-full">
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+        <div className="text-center mb-4 sm:mb-6 lg:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
             Quiz Results
           </h1>
-          <p className="text-gray-600 capitalize">{topic} Quiz</p>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 capitalize">{topic} Quiz</p>
         </div>
 
         {/* Score Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200/50 p-8 mb-8 text-center">
-          <div className={`w-32 h-32 bg-gradient-to-r ${color} rounded-full flex items-center justify-center mx-auto mb-6`}>
-            <span className="text-4xl font-bold text-white">{grade}</span>
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl dark:shadow-gray-900/20 border border-gray-200/50 dark:border-gray-700/50 p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6 lg:mb-8 text-center">
+          <div className={`w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-gradient-to-r ${color} rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6`}>
+            <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">{grade}</span>
           </div>
 
-          <div className="mb-6">
-            <div className="text-6xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
+          <div className="mb-4 sm:mb-6">
+            <div className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-gray-200 dark:to-gray-400 bg-clip-text text-transparent mb-2">
               {score} / {questions.length}
             </div>
-            <div className="text-2xl font-semibold text-gray-600">{percentage}%</div>
+            <div className="text-xl sm:text-2xl font-semibold text-gray-600 dark:text-gray-400">{percentage}%</div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-gray-50 rounded-xl p-4">
-              <div className="text-2xl font-bold text-green-600">{score}</div>
-              <div className="text-sm text-gray-600">Correct</div>
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 sm:p-4">
+              <div className="text-xl sm:text-2xl font-bold text-green-600">{score}</div>
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Correct</div>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-4">
-              <div className="text-2xl font-bold text-red-600">{questions.length - score}</div>
-              <div className="text-sm text-gray-600">Incorrect</div>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 sm:p-4">
+              <div className="text-xl sm:text-2xl font-bold text-red-600">{questions.length - score}</div>
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Incorrect</div>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-4">
-              <div className="text-2xl font-bold text-blue-600">{timeFormatted}</div>
-              <div className="text-sm text-gray-600">Time</div>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 sm:p-4">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600">{timeFormatted}</div>
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Time</div>
             </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
           <Link
             to="/dashboard"
-            className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold hover:scale-105 transition-all duration-200 shadow-lg text-center"
+            className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold hover:scale-105 transition-all duration-200 shadow-lg text-center"
           >
             Take Another Quiz
           </Link>
 
           <Link
             to={`/quiz/${topic}`}
-            className="px-8 py-4 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 hover:scale-105 transition-all duration-200 text-center"
+            className="px-6 sm:px-8 py-3 sm:py-4 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 text-center"
           >
             Retake This Quiz
           </Link>
         </div>
 
         {/* Detailed Review */}
-        <div className="mt-8 bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Question Review</h3>
+        <div className="mt-4 sm:mt-6 lg:mt-8 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Question Review</h3>
 
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-96 overflow-y-auto">
             {questions.map((q, i) => {
               const correct = answers[i] === q.correct;
               return (
-                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Question {i + 1}</span>
+                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Question {i + 1}</span>
                   <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    correct ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                    correct ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                   }`}>
                     {correct ? "Correct" : "Incorrect"}
                   </span>

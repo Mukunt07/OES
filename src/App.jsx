@@ -15,6 +15,7 @@ import Leaderboard from "./pages/Leaderboard";
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -24,9 +25,22 @@ export default function App() {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    // Apply theme on mount and when theme changes
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(currentTheme => currentTheme === 'light' ? 'dark' : 'light');
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -34,8 +48,8 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
-        <Navbar user={user} />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar user={user} theme={theme} toggleTheme={toggleTheme} />
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
