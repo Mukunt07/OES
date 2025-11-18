@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { collection, query, orderBy, limit, where, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, limit, where, getDocs, collectionGroup, doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 
 export default function Leaderboard() {
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTopic, setSelectedTopic] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const topics = ["all", "javascript", "general", "current", "sports", "geography", "history", "politics", "books", "movies", "music", "science", "computers"];
 
@@ -16,29 +17,54 @@ export default function Leaderboard() {
         let q;
         if (selectedTopic === "all") {
           q = query(
-            collection(db, "leaderboard"),
+            collectionGroup(db, "results"),
             orderBy("percentage", "desc"),
             orderBy("score", "desc"),
-            orderBy("timestamp", "desc"),
+            orderBy("createdAt", "desc"),
             limit(20)
           );
         } else {
           q = query(
-            collection(db, "leaderboard"),
+            collectionGroup(db, "results"),
             where("topic", "==", selectedTopic),
             orderBy("percentage", "desc"),
             orderBy("score", "desc"),
-            orderBy("timestamp", "desc"),
+            orderBy("createdAt", "desc"),
             limit(20)
           );
         }
 
         const querySnapshot = await getDocs(q);
-        const data = querySnapshot.docs.map((doc, index) => ({
+        const results = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          rank: index + 1,
+          uid: doc.ref.parent.parent.id, // Extract uid from path
           ...doc.data(),
         }));
+
+        // Batch fetch user docs for displayName/email
+        const uids = [...new Set(results.map(r => r.uid))];
+        const userPromises = uids.map(uid => getDoc(doc(db, "users", uid)));
+        const userDocs = await Promise.all(userPromises);
+        const userMap = {};
+        userDocs.forEach((userDoc, index) => {
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            userMap[uids[index]] = {
+              displayName: userData.name || userData.email.split('@')[0],
+              email: userData.email
+            };
+          }
+        });
+
+        // Combine results with user data
+        const data = results.map((result, index) => ({
+          id: result.id,
+          rank: index + 1,
+          ...result,
+          displayName: userMap[result.uid]?.displayName || userMap[result.uid]?.email || "Anonymous",
+          email: userMap[result.uid]?.email || "",
+        }));
+
         setLeaderboardData(data);
       } catch (error) {
         console.error("Error fetching leaderboard:", error);
@@ -53,8 +79,17 @@ export default function Leaderboard() {
   const formatDate = (timestamp) => {
     if (!timestamp) return "N/A";
     const date = timestamp.toDate();
-    return date.toLocaleDateString();
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
+
+  const getAvatarLetter = (displayName, email) => {
+    return (displayName !== "Anonymous" ? displayName : email).charAt(0).toUpperCase();
+  };
+
+  const filteredData = leaderboardData.filter(entry =>
+    entry.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    entry.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const SkeletonRow = () => (
     <tr className="animate-pulse">
@@ -80,26 +115,38 @@ export default function Leaderboard() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-thin tracking-tight mb-4">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-thin tracking-tight mb-4 text-gray-900 dark:text-white">
             Leaderboard
           </h1>
-          <p className="text-xl text-gray-400">Top performers across all quizzes</p>
+          <p className="text-xl text-gray-600 dark:text-gray-400">Top performers across all quizzes</p>
         </div>
 
-        {/* Filter */}
-        <div className="mb-8 flex justify-center">
+        {/* Search and Filter */}
+        <div className="mb-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-3 bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700/50 text-gray-900 dark:text-white rounded-2xl focus:outline-none focus:border-blue-500 transition-colors w-64"
+            />
+          </div>
           <select
             value={selectedTopic}
             onChange={(e) => setSelectedTopic(e.target.value)}
-            className="px-6 py-3 bg-gray-800/50 border border-gray-700/50 text-white rounded-2xl focus:outline-none focus:border-blue-500 transition-colors"
+            className="px-6 py-3 bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700/50 text-gray-900 dark:text-white rounded-2xl focus:outline-none focus:border-blue-500 transition-colors"
           >
             {topics.map((topic) => (
-              <option key={topic} value={topic} className="bg-gray-800">
+              <option key={topic} value={topic} className="bg-white dark:bg-gray-800">
                 {topic === "all" ? "All Topics" : topic.charAt(0).toUpperCase() + topic.slice(1)}
               </option>
             ))}

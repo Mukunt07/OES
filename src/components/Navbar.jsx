@@ -1,23 +1,58 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 
 export default function Navbar() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const handleLogout = async () => {
-    await signOut(auth);
+    const confirmLogout = window.confirm("Are you sure you want to log out?");
+    if (confirmLogout) {
+      await signOut(auth);
+      setToast({ show: true, message: "You have been logged out successfully.", type: "success" });
+    }
   };
+
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast({ show: false, message: "", type: "success" });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.show]);
 
   if (location.pathname === "/" || location.pathname === "/signup") {
     return null;
   }
 
   return (
-    <nav className="bg-gradient-to-r from-black/80 via-gray-900/60 to-black/80 backdrop-blur-2xl shadow-2xl border-b border-gray-800/50 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <>
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-2xl shadow-lg transition-all duration-300 ${
+          toast.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+        }`}>
+          <div className="flex items-center space-x-2">
+            {toast.type === "success" ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
+            <span className="font-medium">{toast.message}</span>
+          </div>
+        </div>
+      )}
+
+      <nav className="bg-gradient-to-r from-black/80 via-gray-900/60 to-black/80 backdrop-blur-2xl shadow-2xl border-b border-gray-800/50 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link
@@ -138,5 +173,6 @@ export default function Navbar() {
         )}
       </div>
     </nav>
+    </>
   );
 }

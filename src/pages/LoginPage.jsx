@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: "", type: "error" });
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -16,13 +17,42 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/dashboard");
     } catch (error) {
-      alert(error.message);
+      setToast({ show: true, message: "Invalid email or password. Please try again.", type: "error" });
     }
     setLoading(false);
   };
 
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast({ show: false, message: "", type: "error" });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.show]);
+
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 py-8 lg:py-12">
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-2xl shadow-lg transition-all duration-300 ${
+          toast.type === "error" ? "bg-red-500 text-white" : "bg-green-500 text-white"
+        }`}>
+          <div className="flex items-center space-x-2">
+            {toast.type === "error" ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
+            <span className="font-medium">{toast.message}</span>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-md w-full space-y-8 p-6 lg:p-8 bg-gray-900/50 backdrop-blur-xl rounded-3xl border border-gray-800/50">
         <div className="text-center">
           <h2 className="text-2xl lg:text-3xl font-thin tracking-tight mb-4">
